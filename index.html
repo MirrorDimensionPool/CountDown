@@ -1,236 +1,288 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kreis-Countdown mit Hintergrund</title>
-    <style>
-        :root {
-            --text-color: #ffffff;
-            --circle-bg: rgba(255, 255, 255, 0.1); /* Leicht transparenter Kreis-Hintergrund */
-            --circle-color: #00ecff;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kreis-Countdown mit Hintergrund</title>
+<style>
+:root {
+  --text-color: #ffffff;
+  --circle-bg: rgba(255, 255, 255, 0.1); /* Leicht transparenter Kreis-Hintergrund */
+  --circle-color: #00ecff;
+}
 
-        body {
-            margin: 0;
-            padding: 0;
-            color: var(--text-color);
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding-top: 40px; 
-            min-height: 100vh;
-            box-sizing: border-box;
-            
-            /* HIER DEIN HINTERGRUNDBILD EINTRAGEN */
-            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('urlaub.jpg');
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-color: #000;
+body {
+  margin: 0;
+  padding: 0;
+  color: var(--text-color);
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Oben ausgerichtet */
+  padding-top: 40px; /* Abstand nach oben */
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden; /* Verhindert Scrollbalken durch fliegende Herzen */
+  position: relative;
+  
+  /* Hintergrundbild-Einstellungen */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('urlaub.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #000000; 
+}
 
-            /* EXTRA FÜR SMARTPHONES (Hochformat) */
-            @media (max-width: 768px) and (orientation: portrait) {
-              body {
-                /* Zwingt das Bild, sich an der Breite des Handys (100%) zu orientieren. */
-                /* Die Höhe (auto) passt sich proportional an. Nichts wird abgeschnitten! */
-                background-size: 100% auto;
-                background-position: top center; /* Zentriert das Bild auf dem Bildschirm */
-              }
-        }
+/* EXTRA FÜR SMARTPHONES (Hochformat) */
+@media (max-width: 768px) and (orientation: portrait) {
+  body {
+    background-size: 100% auto;
+    background-position: top center;
+  }
+}
 
-        /* Container für die gesamte Ansicht */
-        .wrapper {
-            text-align: center;
-            padding: 20px;
-        }
+/* Container für die gesamte Ansicht */
+.wrapper {
+  text-align: center;
+  padding: 20px;
+  z-index: 10; /* Stellt sicher, dass der Countdown VOR den Herzen liegt */
+}
 
-        /* Überschrift Styling */
-        .main-title {
-            font-size: 2.5rem;
-            margin-bottom: 40px;
-            font-weight: 700;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px; /* Abstand zwischen Text und Emojis */
-        }
+/* Überschrift Styling */
+.main-title {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  font-weight: 700;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
 
-        /* Spezifische Schriftart für Emojis zur plattformübergreifenden Darstellung */
-        .emoji {
-            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
-        }
+.emoji {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+}
 
-        .countdown-container {
-            display: flex;
-            gap: 25px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+.countdown-container {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 
-        .time-box {
-            position: relative;
-            width: 150px;
-            height: 150px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.3); /* Dunkelt das Innere des Kreises leicht ab */
-            border-radius: 50%;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        }
+.time-box {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
 
-        /* SVG Kreis-Styling */
-        svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-        }
+svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
 
-        circle {
-            fill: none;
-            stroke-width: 8;
-        }
+circle {
+  fill: none;
+  stroke-width: 8;
+}
 
-        .bg-circle {
-            stroke: var(--circle-bg);
-        }
+.bg-circle {
+  stroke: var(--circle-bg);
+}
 
-        .progress-circle {
-            stroke: var(--circle-color);
-            stroke-linecap: round;
-            stroke-dasharray: 440; 
-            stroke-dashoffset: 0;
-            transition: stroke-dashoffset 0.5s linear;
-        }
+.progress-circle {
+  stroke: var(--circle-color);
+  stroke-linecap: round;
+  stroke-dasharray: 440;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.5s linear;
+}
 
-        /* Text im Kreis */
-        .number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            z-index: 10;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
-        }
+.number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  z-index: 10;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+}
 
-        .label {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 5px;
-            color: #d1d1e0;
-            z-index: 10;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
-        }
-    </style>
+.label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 5px;
+  color: #d1d1e0;
+  z-index: 10;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* STYLING FÜR DIE FLIEGENDEN HERZEN */
+.heart-particle {
+  position: absolute;
+  bottom: -20px; /* Startet knapp unter dem sichtbaren Bildschirm */
+  color: rgba(255, 75, 110, 0.7); /* Schönes Rosa/Rot mit leichter Transparenz */
+  font-family: Arial, sans-serif;
+  user-select: none;
+  pointer-events: none; /* Klicks gehen durch das Herz hindurch auf den Countdown */
+  z-index: 1; /* Fliegt hinter dem Text, aber vor dem Hintergrund */
+  animation: floatUp linear forwards;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1; /* Wird schnell sichtbar */
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    /* Fliegt nach oben und driftet dabei leicht zur Seite mit einer Drehung */
+    transform: translateY(-105vh) translateX(var(--drift)) rotate(var(--rotation));
+    opacity: 0; /* Jedes Herz löst sich am oberen Rand auf */
+  }
+}
+</style>
 </head>
 <body>
 
-    <div class="wrapper">
-        <!-- ÜBERSCHRIFT MIT EMOJIS -->
-        <h1 class="main-title">
-            <span class="emoji">🥰😍🥳</span> 
-            WE - Time 
-            <span class="emoji">🥳😍🥰</span>
-        </h1>
+<div class="wrapper">
+  <h1 class="main-title">
+    <span class="emoji">🥰😍🥳</span> WE - Time <span class="emoji">🥳😍🥰</span>
+  </h1>
 
-        <div class="countdown-container">
-            <!-- Tage -->
-            <div class="time-box">
-                <svg>
-                    <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
-                    <circle class="progress-circle" id="days-circle" cx="75" cy="75" r="70"></circle>
-                </svg>
-                <div class="number" id="days">00</div>
-                <div class="label">Tage</div>
-            </div>
-
-            <!-- Stunden -->
-            <div class="time-box">
-                <svg>
-                    <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
-                    <circle class="progress-circle" id="hours-circle" cx="75" cy="75" r="70"></circle>
-                </svg>
-                <div class="number" id="hours">00</div>
-                <div class="label">Stunden</div>
-            </div>
-
-            <!-- Minuten -->
-            <div class="time-box">
-                <svg>
-                    <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
-                    <circle class="progress-circle" id="minutes-circle" cx="75" cy="75" r="70"></circle>
-                </svg>
-                <div class="number" id="minutes">00</div>
-                <div class="label">Minuten</div>
-            </div>
-
-            <!-- Sekunden -->
-            <div class="time-box">
-                <svg>
-                    <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
-                    <circle class="progress-circle" id="seconds-circle" cx="75" cy="75" r="70"></circle>
-                </svg>
-                <div class="number" id="seconds">00</div>
-                <div class="label">Sekunden</div>
-            </div>
-        </div>
+  <div class="countdown-container">
+    <div class="time-box">
+      <svg>
+        <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
+        <circle class="progress-circle" id="days-circle" cx="75" cy="75" r="70"></circle>
+      </svg>
+      <div class="number" id="days">00</div>
+      <div class="label">Tage</div>
     </div>
 
-    <script>
-        // HIER DAS ZIEL-DATUM ANPASSEN
-        const targetDate = new Date("November 12, 2026 18:00:00").getTime();
+    <div class="time-box">
+      <svg>
+        <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
+        <circle class="progress-circle" id="hours-circle" cx="75" cy="75" r="70"></circle>
+      </svg>
+      <div class="number" id="hours">00</div>
+      <div class="label">Stunden</div>
+    </div>
 
-        const maxValues = {
-            days: 365,
-            hours: 24,
-            minutes: 60,
-            seconds: 60
-        };
+    <div class="time-box">
+      <svg>
+        <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
+        <circle class="progress-circle" id="minutes-circle" cx="75" cy="75" r="70"></circle>
+      </svg>
+      <div class="number" id="minutes">00</div>
+      <div class="label">Minuten</div>
+    </div>
 
-        const totalCircumference = 440;
+    <div class="time-box">
+      <svg>
+        <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
+        <circle class="progress-circle" id="seconds-circle" cx="75" cy="75" r="70"></circle>
+      </svg>
+      <div class="number" id="seconds">00</div>
+      <div class="label">Sekunden</div>
+    </div>
+  </div>
+</div>
 
-        function updateCircle(elementId, value, max) {
-            const circle = document.getElementById(elementId);
-            const offset = totalCircumference - (value / max) * totalCircumference;
-            circle.style.strokeDashoffset = offset;
-        }
+<script>
+// COUNTDOWN LOGIK
+const targetDate = new Date("November 12, 2026 18:00:00").getTime();
+const maxValues = { days: 365, hours: 24, minutes: 60, seconds: 60 };
+const totalCircumference = 440;
 
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const difference = targetDate - now;
+function updateCircle(elementId, value, max) {
+  const circle = document.getElementById(elementId);
+  const offset = totalCircumference - (value / max) * totalCircumference;
+  circle.style.strokeDashoffset = offset;
+}
 
-            if (difference < 0) {
-                document.querySelectorAll('.number').forEach(num => num.innerText = "00");
-                document.querySelectorAll('.progress-circle').forEach(circle => circle.style.strokeDashoffset = totalCircumference);
-                clearInterval(intervalId);
-                return;
-            }
+function updateCountdown() {
+  const now = new Date().getTime();
+  const difference = targetDate - now;
 
-            const d = Math.floor(difference / (1000 * 60 * 60 * 24));
-            const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((difference % (1000 * 60)) / 1000);
+  if (difference < 0) {
+    document.querySelectorAll('.number').forEach(num => num.innerText = "00");
+    document.querySelectorAll('.progress-circle').forEach(circle => circle.style.strokeDashoffset = totalCircumference);
+    clearInterval(intervalId);
+    return;
+  }
 
-            document.getElementById("days").innerText = d < 10 ? "0" + d : d;
-            document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
-            document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
-            document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
+  const d = Math.floor(difference / (1000 * 60 * 60 * 24));
+  const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+  const s = Math.floor((difference % (1000 * 60)) / 1000);
 
-            updateCircle("days-circle", d, maxValues.days);
-            updateCircle("hours-circle", h, maxValues.hours);
-            updateCircle("minutes-circle", m, maxValues.minutes);
-            updateCircle("seconds-circle", s, maxValues.seconds);
-        }
+  document.getElementById("days").innerText = d < 10 ? "0" + d : d;
+  document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
+  document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
+  document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
 
-        updateCountdown();
-        const intervalId = setInterval(updateCountdown, 1000);
-    </script>
+  updateCircle("days-circle", d, maxValues.days);
+  updateCircle("hours-circle", h, maxValues.hours);
+  updateCircle("minutes-circle", m, maxValues.minutes);
+  updateCircle("seconds-circle", s, maxValues.seconds);
+}
+
+updateCountdown();
+const intervalId = setInterval(updateCountdown, 1000);
+
+// SCRIPT FÜR DIE FLIEGENDEN HERZEN
+function createHeart() {
+  const heart = document.createElement('div');
+  heart.classList.add('heart-particle');
+  
+  // Zufälliges Herz-Symbol wählen
+  const heartTypes = ['❤️', '💖', '💝', '💕'];
+  heart.innerText = heartTypes[Math.floor(Math.random() * heartTypes.length)];
+  
+  // Zufällige Position am unteren Bildschirmrand (0% bis 100% Breite)
+  heart.style.left = Math.random() * 100 + 'vw';
+  
+  // Zufällige Größe (zwischen 12px und 28px)
+  const size = Math.random() * 16 + 12;
+  heart.style.fontSize = size + 'px';
+  
+  // Zufällige Flugdauer (zwischen 4 und 8 Sekunden)
+  const duration = Math.random() * 4 + 4;
+  heart.style.animationDuration = duration + 's';
+  
+  // Zufällige CSS-Variablen an die Animation übergeben (Drift zur Seite und Drehung)
+  const drift = (Math.random() * 150 - 75) + 'px';
+  const rotation = (Math.random() * 360 - 180) + 'deg';
+  heart.style.setProperty('--drift', drift);
+  heart.style.setProperty('--rotation', rotation);
+  
+  document.body.appendChild(heart);
+  
+  // Das Herz-Element automatisch löschen, wenn die Animation vorbei ist
+  setTimeout(() => {
+    heart.remove();
+  }, duration * 1000);
+}
+
+// Alle 400 Millisekunden ein neues Herz auf die Reise schicken
+setInterval(createHeart, 400);
+</script>
+
 </body>
 </html>
