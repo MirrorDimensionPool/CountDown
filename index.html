@@ -23,11 +23,20 @@
             
             /* HIER DEIN HINTERGRUNDBILD EINTRAGEN */
             background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('urlaub.jpg');
-            background-size: 100% 100%;
+            background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
             background-color: #000;
+
+            /* EXTRA FÜR SMARTPHONES (Hochformat) */
+            @media (max-width: 768px) and (orientation: portrait) {
+              body {
+                /* Zwingt das Bild, sich an der Breite des Handys (100%) zu orientieren. */
+                /* Die Höhe (auto) passt sich proportional an. Nichts wird abgeschnitten! */
+                background-size: 100% auto;
+                background-position: top center; /* Zentriert das Bild auf dem Bildschirm */
+              }
         }
 
         /* Container für die gesamte Ansicht */
