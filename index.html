@@ -31,14 +31,15 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-color: #000000; 
-}
 
-/* EXTRA FÜR SMARTPHONES (Hochformat) */
-@media (max-width: 768px) and (orientation: portrait) {
-  body {
-    background-size: 100% auto;
-    background-position: top center;
-  }
+  /* EXTRA FÜR SMARTPHONES (Hochformat) */
+  @media (max-width: 768px) and (orientation: portrait) {
+    body {
+      /* Zwingt das Bild, sich an der Breite des Handys (100%) zu orientieren. */
+      /* Die Höhe (auto) passt sich proportional an. Nichts wird abgeschnitten! */
+      background-size: 100% auto;
+      background-position: top center; /* Zentriert das Bild auf dem Bildschirm */
+    }  
 }
 
 /* Container für die gesamte Ansicht */
