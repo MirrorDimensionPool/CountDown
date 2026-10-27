@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kreis-Countdown mit Hintergrund</title>
+    <style>
+        :root {
+            --text-color: #ffffff;
+            --circle-bg: rgba(255, 255, 255, 0.1); /* Leicht transparenter Kreis-Hintergrund */
+            --circle-color: #00ecff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            
+            /* HIER DEIN HINTERGRUNDBILD EINTRAGEN */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('urlaub.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* Container für die gesamte Ansicht */
+        .wrapper {
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Überschrift Styling */
+        .main-title {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            font-weight: 700;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px; /* Abstand zwischen Text und Emojis */
+        }
+
+        /* Spezifische Schriftart für Emojis zur plattformübergreifenden Darstellung */
+        .emoji {
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+        }
+
+        .countdown-container {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .time-box {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3); /* Dunkelt das Innere des Kreises leicht ab */
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        /* SVG Kreis-Styling */
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        circle {
+            fill: none;
+            stroke-width: 8;
+        }
+
+        .bg-circle {
+            stroke: var(--circle-bg);
+        }
+
+        .progress-circle {
+            stroke: var(--circle-color);
+            stroke-linecap: round;
+            stroke-dasharray: 440; 
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 0.5s linear;
+        }
+
+        /* Text im Kreis */
+        .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            z-index: 10;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+        }
+
+        .label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 5px;
+            color: #d1d1e0;
+            z-index: 10;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- ÜBERSCHRIFT MIT EMOJIS -->
+        <h1 class="main-title">
+            <span class="emoji">🚀</span> 
+            Unser großes Event 
+            <span class="emoji">🎉</span>
+        </h1>
+
+        <div class="countdown-container">
+            <!-- Tage -->
+            <div class="time-box">
+                <svg>
+                    <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
+                    <circle class="progress-circle" id="days-circle" cx="75" cy="75" r="70"></circle>
+                </svg>
+                <div class="number" id="days">00</div>
+                <div class="label">Tage</div>
+            </div>
+
+            <!-- Stunden -->
+            <div class="time-box">
+                <svg>
+                    <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
+                    <circle class="progress-circle" id="hours-circle" cx="75" cy="75" r="70"></circle>
+                </svg>
+                <div class="number" id="hours">00</div>
+                <div class="label">Stunden</div>
+            </div>
+
+            <!-- Minuten -->
+            <div class="time-box">
+                <svg>
+                    <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
+                    <circle class="progress-circle" id="minutes-circle" cx="75" cy="75" r="70"></circle>
+                </svg>
+                <div class="number" id="minutes">00</div>
+                <div class="label">Minuten</div>
+            </div>
+
+            <!-- Sekunden -->
+            <div class="time-box">
+                <svg>
+                    <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
+                    <circle class="progress-circle" id="seconds-circle" cx="75" cy="75" r="70"></circle>
+                </svg>
+                <div class="number" id="seconds">00</div>
+                <div class="label">Sekunden</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // HIER DAS ZIEL-DATUM ANPASSEN
+        const targetDate = new Date("December 31, 2026 23:59:59").getTime();
+
+        const maxValues = {
+            days: 365,
+            hours: 24,
+            minutes: 60,
+            seconds: 60
+        };
+
+        const totalCircumference = 440;
+
+        function updateCircle(elementId, value, max) {
+            const circle = document.getElementById(elementId);
+            const offset = totalCircumference - (value / max) * totalCircumference;
+            circle.style.strokeDashoffset = offset;
+        }
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const difference = targetDate - now;
+
+            if (difference < 0) {
+                document.querySelectorAll('.number').forEach(num => num.innerText = "00");
+                document.querySelectorAll('.progress-circle').forEach(circle => circle.style.strokeDashoffset = totalCircumference);
+                clearInterval(intervalId);
+                return;
+            }
+
+            const d = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = d < 10 ? "0" + d : d;
+            document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
+            document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
+            document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
+
+            updateCircle("days-circle", d, maxValues.days);
+            updateCircle("hours-circle", h, maxValues.hours);
+            updateCircle("minutes-circle", m, maxValues.minutes);
+            updateCircle("seconds-circle", s, maxValues.seconds);
+        }
+
+        updateCountdown();
+        const intervalId = setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
