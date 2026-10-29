@@ -38,10 +38,19 @@
         width: 100vw;
         height: 100vh;
         background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('urlaub.jpg');
+        /* Verhindert extremes Zoomen: Nutzt contain auf kleinen Bildschirmen und cover auf großen Desktop-Monitoren */
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         z-index: 1;
+    }
+
+    /* Optimierung für Handys: Verhindert, dass das Hintergrundbild stark beschnitten/gezoomt wird */
+    @media (max-width: 768px) {
+        .bg-container {
+            background-size: cover;
+            background-position: center top; /* Richtet das Bild am oberen Rand aus, damit Köpfe/Motive sichtbar bleiben */
+        }
     }
 
     /* 2. HERZEN-CONTAINER */
@@ -79,8 +88,8 @@
     }
 
     .main-title {
-        font-size: 6vw; /* Schriftgröße passt sich dynamisch der Bildschirmbreite an */
-        max-size: 1.8rem; /* Deckelung für größere Bildschirme */
+        /* KORREKTUR: clamp() statt nicht existierendem max-size */
+        font-size: clamp(1.2rem, 6vw, 1.8rem); 
         margin-bottom: 40px;
         font-weight: 700;
         text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
@@ -94,7 +103,6 @@
     /* Ab mittelgroßen Displays stehen Titel und Emojis wieder in einer Reihe */
     @media (min-width: 400px) {
         .main-title {
-            font-size: 1.8rem;
             flex-direction: row;
         }
     }
@@ -116,12 +124,13 @@
         margin: 0 auto;
     }
 
-    /* KORREKTUR: Verkleinert die Boxen leicht, damit sie auf JEDEM Smartphone im 2x2 Raster Platz haben */
+    /* KORREKTUR: Boxen passen sich nun stufenlos an und bleiben kreisrund */
     .time-box {
         position: relative;
 
-        width: clamp(100px, 22vw, 150px);
-        height: clamp(100px, 22vw, 150px);
+        /* Nutzt vw für die Dynamik, bleibt aber im Rahmen */
+        width: clamp(110px, 35vw, 150px);
+        height: clamp(110px, 35vw, 150px);
 
         display: flex;
         flex-direction: column;
@@ -150,7 +159,7 @@
         stroke: var(--circle-bg);
     }
 
-    /* KORREKTUR: Die SVG-Kreise passen sich nun automatisch an die 130px Box-Größe an */
+    /* KORREKTUR: Die SVG-Kreise passen sich nun automatisch an die Box-Größe an */
     .progress-circle {
         stroke: var(--circle-color);
         stroke-linecap: round;
@@ -159,18 +168,20 @@
         transition: stroke-dashoffset 0.5s linear;
     }
 
+    /* KORREKTUR: Schriften innerhalb der Box skalieren jetzt mit, um nicht überzulaufen */
     .number {
-        font-size: 2rem; /* Leicht verkleinert, damit es perfekt in die 130px Box passt */
+        font-size: clamp(1.4rem, 6vw, 2rem); 
         font-weight: bold;
         z-index: 10;
         text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+        line-height: 1;
     }
 
     .label {
-        font-size: 0.75rem;
+        font-size: clamp(0.6rem, 2.5vw, 0.75rem);
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-top: 2px;
+        margin-top: 4px;
         color: #d1d1e0;
         z-index: 10;
         text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
@@ -267,8 +278,10 @@
 
     function updateCircle(elementId, value, max) {
         const circle = document.getElementById(elementId);
-        const offset = totalCircumference - (value / max) * totalCircumference;
-        circle.style.strokeDashoffset = offset;
+        if(circle) {
+            const offset = totalCircumference - (value / max) * totalCircumference;
+            circle.style.strokeDashoffset = offset;
+        }
     }
 
     function updateCountdown() {
@@ -301,7 +314,7 @@
     updateCountdown();
     const intervalId = setInterval(updateCountdown, 1000);
 
-    // KORRIGIERTE HERZEN LOGIK (Nutzt jetzt den dedizierten Container)
+    // KORRIGIERTE HERZEN LOGIK
     const heartContainer = document.getElementById('heartContainer');
 
     function createHeart() {
