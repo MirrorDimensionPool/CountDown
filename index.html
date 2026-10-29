@@ -1,327 +1,344 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kreis-Countdown mit Hintergrund</title>
-    <style>
-        :root {
-            --text-color: #ffffff;
-            --circle-bg: rgba(255, 255, 255, 0.1);
-            --circle-color: #00ecff;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kreis-Countdown mit Hintergrund</title>
+  <style>
+    :root {
+        --text-color: #ffffff;
+        --circle-bg: rgba(255, 255, 255, 0.1);
+        --circle-color: #00ecff;
+    }
 
-        /* WICHTIG: Verhindert jegliche Scrollbalken auf der gesamten Seite */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden; 
-            background-color: #000000;
-        }
+    /* Verhindert jegliche Scrollbalken auf der gesamten Seite */
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden; 
+        background-color: #000000;
+    }
 
-        body {
-            color: var(--text-color);
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            position: relative;
-        }
+    body {
+        color: var(--text-color);
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        position: relative;
+    }
 
-        /* 1. HINTERGRUND-CONTAINER: Bleibt IMMER exakt so groß wie der Smartphone-Bildschirm */
-        .bg-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('urlaub.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            z-index: 1;
-        }
+    /* 1. HINTERGRUND-CONTAINER */
+    .bg-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('urlaub.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: 1;
+    }
 
-        /* Smartphone-Optimierung: Erzwingt die volle Breite im Hochformat ohne Abschneiden */
-        @media (max-width: 768px) and (orientation: portrait) {
-            .bg-container {
-                background-size: 100% auto;
-                background-position: top center;
-            }  
-        }
+    /* 2. HERZEN-CONTAINER */
+    .heart-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 2;
+    }
 
-        /* 2. HERZEN-CONTAINER: Isoliert die Herzen, damit sie keine Scrollbalken erzeugen */
-        .heart-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            pointer-events: none; /* Klicks gehen durch den Container durch */
-            z-index: 2;
-        }
+    /* 3. CONTENT-CONTAINER */
+    .scroll-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: flex;
+        align-items: center; /* Zentriert den Inhalt perfekt vertikal */
+        justify-content: center;
+        box-sizing: border-box;
+        z-index: 3;
+    }
 
-        /* 3. CONTENT-CONTAINER: Erlaubt internes Scrollen des Countdowns, falls nötig */
-        .scroll-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            overflow-y: auto; /* Erlaubt vertikales Scrollen nur für das Layout */
-            overflow-x: hidden;
-            padding-top: 40px;
-            box-sizing: border-box;
-            z-index: 3; /* Liegt ganz vorne vor Bild und Herzen */
-        }
+    .wrapper {
+        text-align: center;
+        padding: 20px;
+        width: 100%;
+        max-width: 500px; /* Begrenzt die maximale Breite auf Smartphones */
+        box-sizing: border-box;
+    }
 
-        .wrapper {
-            text-align: center;
-            padding: 20px;
-            margin: 0 auto;
-        }
+    .main-title {
+        font-size: 6vw; /* Schriftgröße passt sich dynamisch der Bildschirmbreite an */
+        max-size: 1.8rem; /* Deckelung für größere Bildschirme */
+        margin-bottom: 40px;
+        font-weight: 700;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+        display: flex;
+        flex-direction: column; /* Stapelt Emojis und Text auf sehr kleinen Handys sauber untereinander */
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
 
+    /* Ab mittelgroßen Displays stehen Titel und Emojis wieder in einer Reihe */
+    @media (min-width: 400px) {
         .main-title {
             font-size: 1.8rem;
-            margin-bottom: 80px;
-            font-weight: 700;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
+            flex-direction: row;
         }
+    }
 
-        .emoji {
-            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
-        }
+    .emoji {
+        font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+        font-size: 1.5rem;
+    }
 
-        .countdown-container {
-            display: flex;
-            gap: 25px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+    /* KORREKTUR: Nutzt CSS Grid für eine stabile 2x2 Anordnung auf Handys */
+    .countdown-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Erzwingt immer genau 2 Kreise pro Reihe */
+        gap: 20px;
+        justify-items: center;
+        align-items: center;
+        width: 100%;
+        max-width: 360px;
+        margin: 0 auto;
+    }
 
-        .time-box {
-            position: relative;
-            width: 150px;
-            height: 150px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 50%;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        }
+    /* KORREKTUR: Verkleinert die Boxen leicht, damit sie auf JEDEM Smartphone im 2x2 Raster Platz haben */
+    .time-box {
+        position: relative;
 
-        svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-        }
+        width: clamp(100px, 22vw, 150px);
+        height: clamp(100px, 22vw, 150px);
 
-        circle {
-            fill: none;
-            stroke-width: 8;
-        }
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 50%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
 
-        .bg-circle {
-            stroke: var(--circle-bg);
-        }
+    svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+    }
 
-        .progress-circle {
-            stroke: var(--circle-color);
-            stroke-linecap: round;
-            stroke-dasharray: 440; 
-            stroke-dashoffset: 0;
-            transition: stroke-dashoffset 0.5s linear;
-        }
+    circle {
+        fill: none;
+        stroke-width: 6;
+    }
 
-        .number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            z-index: 10;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
-        }
+    .bg-circle {
+        stroke: var(--circle-bg);
+    }
 
-        .label {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 5px;
-            color: #d1d1e0;
-            z-index: 10;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
-        }
-            
-        /* Herzen-Partikel */
-        .heart-particle {
-            position: absolute;
-            bottom: -30px;
-            color: rgba(255, 75, 110, 0.7);
-            font-family: Arial, sans-serif;
-            user-select: none;
-            pointer-events: none;
-            animation: floatUp linear forwards;
-        }
+    /* KORREKTUR: Die SVG-Kreise passen sich nun automatisch an die 130px Box-Größe an */
+    .progress-circle {
+        stroke: var(--circle-color);
+        stroke-linecap: round;
+        stroke-dasharray: 440; 
+        stroke-dashoffset: 0;
+        transition: stroke-dashoffset 0.5s linear;
+    }
 
-        @keyframes floatUp {
-            0% {
-                transform: translateY(0) translateX(0) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateY(-110vh) translateX(var(--drift)) rotate(var(--rotation));
-                opacity: 0;
-            }
+    .number {
+        font-size: 2rem; /* Leicht verkleinert, damit es perfekt in die 130px Box passt */
+        font-weight: bold;
+        z-index: 10;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    .label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 2px;
+        color: #d1d1e0;
+        z-index: 10;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+    }
+        
+    /* Herzen-Partikel */
+    .heart-particle {
+        position: absolute;
+        bottom: -30px;
+        color: rgba(255, 75, 110, 0.7);
+        font-family: Arial, sans-serif;
+        user-select: none;
+        pointer-events: none;
+        animation: floatUp linear forwards;
+    }
+
+    @keyframes floatUp {
+        0% {
+            transform: translateY(0) translateX(0) rotate(0deg);
+            opacity: 0;
         }
-    </style>
+        10% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 0.8;
+        }
+        100% {
+            transform: translateY(-110vh) translateX(var(--drift)) rotate(var(--rotation));
+            opacity: 0;
+        }
+    }
+
+  </style>
 </head>
 <body>
 
-    <!-- Die Hintergrund-Ebenen -->
-    <div class="bg-container"></div>
-    <div class="heart-container" id="heartContainer"></div>
+  <!-- Die Hintergrund-Ebenen -->
+  <div class="bg-container"></div>
+  <div class="heart-container" id="heartContainer"></div>
 
-    <!-- Die sichtbare Content-Ebene -->
-    <div class="scroll-wrapper">
-        <div class="wrapper">
-            <h1 class="main-title">
-                <span class="emoji">🥰😍🥳</span>WE Time<span class="emoji">🥳😍🥰</span>
-            </h1>
+  <!-- Die sichtbare Content-Ebene -->
+  <div class="scroll-wrapper">
+    <div class="wrapper">
+      <h1 class="main-title">
+          <span class="emoji">🥰😍🥳</span>WE Time<span class="emoji">🥳😍🥰</span>
+      </h1>
 
-            <div class="countdown-container">
-                <div class="time-box">
-                    <svg>
-                        <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
-                        <circle class="progress-circle" id="days-circle" cx="75" cy="75" r="70"></circle>
-                    </svg>
-                    <div class="number" id="days">00</div>
-                    <div class="label">Tage</div>
-                </div>
-
-                <div class="time-box">
-                    <svg>
-                        <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
-                        <circle class="progress-circle" id="hours-circle" cx="75" cy="75" r="70"></circle>
-                    </svg>
-                    <div class="number" id="hours">00</div>
-                    <div class="label">Stunden</div>
-                </div>
-
-                <div class="time-box">
-                    <svg>
-                        <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
-                        <circle class="progress-circle" id="minutes-circle" cx="75" cy="75" r="70"></circle>
-                    </svg>
-                    <div class="number" id="minutes">00</div>
-                    <div class="label">Minuten</div>
-                </div>
-
-                <div class="time-box">
-                    <svg>
-                        <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
-                        <circle class="progress-circle" id="seconds-circle" cx="75" cy="75" r="70"></circle>
-                    </svg>
-                    <div class="number" id="seconds">00</div>
-                    <div class="label">Sekunden</div>
-                </div>
-            </div>
+      <div class="countdown-container">
+        <div class="time-box">
+          <svg viewBox="0 0 150 150">
+              <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
+              <circle class="progress-circle" id="days-circle" cx="75" cy="75" r="70"></circle>
+          </svg>
+          <div class="number" id="days">00</div>
+          <div class="label">Tage</div>
         </div>
+
+        <div class="time-box">
+          <svg viewBox="0 0 150 150">
+              <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
+              <circle class="progress-circle" id="hours-circle" cx="75" cy="75" r="70"></circle>
+          </svg>
+          <div class="number" id="hours">00</div>
+          <div class="label">Stunden</div>
+        </div>
+
+        <div class="time-box">
+          <svg viewBox="0 0 150 150">
+              <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
+              <circle class="progress-circle" id="minutes-circle" cx="75" cy="75" r="70"></circle>
+          </svg>
+          <div class="number" id="minutes">00</div>
+          <div class="label">Minuten</div>
+        </div>
+
+        <div class="time-box">
+          <svg viewBox="0 0 150 150">
+              <circle class="bg-circle" cx="75" cy="75" r="70"></circle>
+              <circle class="progress-circle" id="seconds-circle" cx="75" cy="75" r="70"></circle>
+          </svg>
+          <div class="number" id="seconds">00</div>
+          <div class="label">Sekunden</div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // COUNTDOWN LOGIK
-        const targetDate = new Date("November 11, 2026 18:00:00").getTime();
-        const maxValues = {days: 365, hours: 24, minutes: 60, seconds: 60};
-        const totalCircumference = 440;
+  <script>
+    // COUNTDOWN LOGIK
+    const targetDate = new Date("November 11, 2026 18:00:00").getTime();
+    const maxValues = {days: 365, hours: 24, minutes: 60, seconds: 60};
+    const totalCircumference = 440;
 
-        function updateCircle(elementId, value, max) {
-            const circle = document.getElementById(elementId);
-            const offset = totalCircumference - (value / max) * totalCircumference;
-            circle.style.strokeDashoffset = offset;
+    function updateCircle(elementId, value, max) {
+        const circle = document.getElementById(elementId);
+        const offset = totalCircumference - (value / max) * totalCircumference;
+        circle.style.strokeDashoffset = offset;
+    }
+
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const difference = targetDate - now;
+
+        if (difference < 0) {
+            document.querySelectorAll('.number').forEach(num => num.innerText = "00");
+            document.querySelectorAll('.progress-circle').forEach(circle => circle.style.strokeDashoffset = totalCircumference);
+            clearInterval(intervalId);
+            return;
         }
 
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const difference = targetDate - now;
+        const d = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((difference % (1000 * 60)) / 1000);
 
-            if (difference < 0) {
-                document.querySelectorAll('.number').forEach(num => num.innerText = "00");
-                document.querySelectorAll('.progress-circle').forEach(circle => circle.style.strokeDashoffset = totalCircumference);
-                clearInterval(intervalId);
-                return;
-            }
+        document.getElementById("days").innerText = d < 10 ? "0" + d : d;
+        document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
+        document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
+        document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
 
-            const d = Math.floor(difference / (1000 * 60 * 60 * 24));
-            const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((difference % (1000 * 60)) / 1000);
+        updateCircle("days-circle", d, maxValues.days);
+        updateCircle("hours-circle", h, maxValues.hours);
+        updateCircle("minutes-circle", m, maxValues.minutes);
+        updateCircle("seconds-circle", s, maxValues.seconds);
+    }
 
-            document.getElementById("days").innerText = d < 10 ? "0" + d : d;
-            document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
-            document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
-            document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
+    updateCountdown();
+    const intervalId = setInterval(updateCountdown, 1000);
 
-            updateCircle("days-circle", d, maxValues.days);
-            updateCircle("hours-circle", h, maxValues.hours);
-            updateCircle("minutes-circle", m, maxValues.minutes);
-            updateCircle("seconds-circle", s, maxValues.seconds);
-        }
+    // KORRIGIERTE HERZEN LOGIK (Nutzt jetzt den dedizierten Container)
+    const heartContainer = document.getElementById('heartContainer');
 
-        updateCountdown();
-        const intervalId = setInterval(updateCountdown, 1000);
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart-particle');
+        
+      // Zufälliges Herz-Symbol wählen
+      const heartTypes = ['❤️', '💖', '💝', '💕'];
+      heart.innerText = heartTypes[Math.floor(Math.random() * heartTypes.length)];
+      
+      // Zufällige Position am unteren Bildschirmrand (0% bis 100% Breite)
+      heart.style.left = Math.random() * 100 + 'vw';
+      
+      // Zufällige Größe (zwischen 12px und 28px)
+      const size = Math.random() * 16 + 12;
+      heart.style.fontSize = size + 'px';
+      
+      // Zufällige Flugdauer (zwischen 4 und 8 Sekunden)
+      const duration = Math.random() * 4 + 4;
+      heart.style.animationDuration = duration + 's';
+      
+      // Zufällige CSS-Variablen an die Animation übergeben (Drift zur Seite und Drehung)
+      const drift = (Math.random() * 150 - 75) + 'px';
+      const rotation = (Math.random() * 360 - 180) + 'deg';
+      heart.style.setProperty('--drift', drift);
+      heart.style.setProperty('--rotation', rotation);
+      
+      document.body.appendChild(heart);
+      
+      // Das Herz-Element automatisch löschen, wenn die Animation vorbei ist
+      setTimeout(() => {
+        heart.remove();
+      }, duration * 1000);
+    }
 
-        // KORRIGIERTE HERZEN LOGIK (Nutzt jetzt den dedizierten Container)
-        const heartContainer = document.getElementById('heartContainer');
-
-        function createHeart() {
-          const heart = document.createElement('div');
-          heart.classList.add('heart-particle');
-            
-          // Zufälliges Herz-Symbol wählen
-          const heartTypes = ['❤️', '💖', '💝', '💕'];
-          heart.innerText = heartTypes[Math.floor(Math.random() * heartTypes.length)];
-          
-          // Zufällige Position am unteren Bildschirmrand (0% bis 100% Breite)
-          heart.style.left = Math.random() * 100 + 'vw';
-          
-          // Zufällige Größe (zwischen 12px und 28px)
-          const size = Math.random() * 16 + 12;
-          heart.style.fontSize = size + 'px';
-          
-          // Zufällige Flugdauer (zwischen 4 und 8 Sekunden)
-          const duration = Math.random() * 4 + 4;
-          heart.style.animationDuration = duration + 's';
-          
-          // Zufällige CSS-Variablen an die Animation übergeben (Drift zur Seite und Drehung)
-          const drift = (Math.random() * 150 - 75) + 'px';
-          const rotation = (Math.random() * 360 - 180) + 'deg';
-          heart.style.setProperty('--drift', drift);
-          heart.style.setProperty('--rotation', rotation);
-          
-          document.body.appendChild(heart);
-          
-          // Das Herz-Element automatisch löschen, wenn die Animation vorbei ist
-          setTimeout(() => {
-            heart.remove();
-          }, duration * 1000);
-        }
-
-        // Alle 400 Millisekunden ein neues Herz auf die Reise schicken
-        setInterval(createHeart, 400);                
-    </script>
+    // Alle 400 Millisekunden ein neues Herz auf die Reise schicken
+    setInterval(createHeart, 400);                
+  </script>
 </body>
-</html>            
+</html>
