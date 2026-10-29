@@ -59,10 +59,10 @@
     /* NEU: Bild-Container, der das Bild im richtigen Verhältnis hält */
     .image-container {
         width: 100%;
-        max-width: 500px; /* Begrenzt die Breite auf großen Bildschirmen, damit es nicht riesig wird */
+        max-width: 500px; 
         margin: 0 auto;
-        display: flex;
-        justify-content: center;
+        position: relative; /* Wichtig für die absolute Positionierung des Titels */
+        display: block; /* ÄNDERUNG: Verhindert, dass Elemente nebeneinander geschoben werden */
     }
 
     /* NEU: Das eigentliche Bild, das perfekt mitskaliert */
