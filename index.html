@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kreis-Countdown mit Hintergrund</title>
+  <title>Kreis-Countdown mit Header-Bild</title>
   <style>
     :root {
         --text-color: #ffffff;
@@ -11,14 +11,14 @@
         --circle-color: #00ecff;
     }
 
-    /* Verhindert jegliche Scrollbalken auf der gesamten Seite */
+    /* Setzt den Haupt-Hintergrund auf edles Schwarz */
     html, body {
         margin: 0;
         padding: 0;
         width: 100%;
         height: 100%;
-        overflow: hidden; 
-        background-color: #000000;
+        overflow: hidden; /* Verhindert horizontales Scrollen */
+        background-color: #0d0d11; /* Dunkler, moderner Hintergrund */
     }
 
     body {
@@ -30,30 +30,7 @@
         position: relative;
     }
 
-    /* 1. HINTERGRUND-CONTAINER */
-    .bg-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('urlaub.jpg');
-        /* Verhindert extremes Zoomen: Nutzt contain auf kleinen Bildschirmen und cover auf großen Desktop-Monitoren */
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        z-index: 1;
-    }
-
-    /* Optimierung für Handys: Verhindert, dass das Hintergrundbild stark beschnitten/gezoomt wird */
-    @media (max-width: 768px) {
-        .bg-container {
-            background-size: cover;
-            background-position: center top; /* Richtet das Bild am oberen Rand aus, damit Köpfe/Motive sichtbar bleiben */
-        }
-    }
-
-    /* 2. HERZEN-CONTAINER */
+    /* 1. HERZEN-CONTAINER (Bleibt fixiert im Hintergrund) */
     .heart-container {
         position: fixed;
         top: 0;
@@ -65,42 +42,61 @@
         z-index: 2;
     }
 
-    /* 3. CONTENT-CONTAINER */
+    /* 2. CONTENT-CONTAINER */
     .scroll-wrapper {
         position: relative;
         width: 100%;
-        height: 100vh;
-        overflow-y: auto;
-        overflow-x: hidden;
+        min-height: 100vh;
         display: flex;
-        align-items: center; /* Zentriert den Inhalt perfekt vertikal */
-        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
         box-sizing: border-box;
         z-index: 3;
+        padding-bottom: 40px; /* Platzhalter ganz unten */
+    }
+
+    /* NEU: Bild-Container, der das Bild im richtigen Verhältnis hält */
+    .image-container {
+        width: 100%;
+        max-width: 500px; /* Begrenzt die Breite auf großen Bildschirmen, damit es nicht riesig wird */
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+    }
+
+    /* NEU: Das eigentliche Bild, das perfekt mitskaliert */
+    .responsive-img {
+        width: 100%;
+        height: auto; /* Erzwingt das korrekte Seitenverhältnis */
+        display: block;
+        object-fit: contain;
+        /* Optionale Verschönerung: Schickes Abrunden an den Ecken */
+        border-radius: 0 0 20px 20px; 
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
     }
 
     .wrapper {
         text-align: center;
         padding: 20px;
         width: 100%;
-        max-width: 500px; /* Begrenzt die maximale Breite auf Smartphones */
+        max-width: 500px; 
         box-sizing: border-box;
     }
 
     .main-title {
-        /* KORREKTUR: clamp() statt nicht existierendem max-size */
-        font-size: clamp(1.2rem, 6vw, 1.8rem); 
-        margin-bottom: 40px;
+        font-size: clamp(1.4rem, 6vw, 2rem); 
+        margin-top: 25px;
+        margin-bottom: 30px;
         font-weight: 700;
         text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
         display: flex;
-        flex-direction: column; /* Stapelt Emojis und Text auf sehr kleinen Handys sauber untereinander */
+        flex-direction: column; 
         align-items: center;
         justify-content: center;
         gap: 10px;
     }
 
-    /* Ab mittelgroßen Displays stehen Titel und Emojis wieder in einer Reihe */
     @media (min-width: 400px) {
         .main-title {
             flex-direction: row;
@@ -112,10 +108,9 @@
         font-size: 1.5rem;
     }
 
-    /* KORREKTUR: Nutzt CSS Grid für eine stabile 2x2 Anordnung auf Handys */
     .countdown-container {
         display: grid;
-        grid-template-columns: repeat(2, 1fr); /* Erzwingt immer genau 2 Kreise pro Reihe */
+        grid-template-columns: repeat(2, 1fr); 
         gap: 20px;
         justify-items: center;
         align-items: center;
@@ -124,21 +119,19 @@
         margin: 0 auto;
     }
 
-    /* KORREKTUR: Boxen passen sich nun stufenlos an und bleiben kreisrund */
     .time-box {
         position: relative;
-
-        /* Nutzt vw für die Dynamik, bleibt aber im Rahmen */
         width: clamp(110px, 35vw, 150px);
         height: clamp(110px, 35vw, 150px);
-
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(255, 255, 255, 0.05); /* Leicht transparenter, edler Box-Hintergrund */
+        backdrop-filter: blur(5px); /* Macht den Hintergrund unter der Box leicht weich */
         border-radius: 50%;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     svg {
@@ -159,7 +152,6 @@
         stroke: var(--circle-bg);
     }
 
-    /* KORREKTUR: Die SVG-Kreise passen sich nun automatisch an die Box-Größe an */
     .progress-circle {
         stroke: var(--circle-color);
         stroke-linecap: round;
@@ -168,7 +160,6 @@
         transition: stroke-dashoffset 0.5s linear;
     }
 
-    /* KORREKTUR: Schriften innerhalb der Box skalieren jetzt mit, um nicht überzulaufen */
     .number {
         font-size: clamp(1.4rem, 6vw, 2rem); 
         font-weight: bold;
@@ -214,17 +205,21 @@
             opacity: 0;
         }
     }
-
   </style>
 </head>
 <body>
 
-  <!-- Die Hintergrund-Ebenen -->
-  <div class="bg-container"></div>
+  <!-- Herzen fliegen weiterhin im gesamten Hintergrund -->
   <div class="heart-container" id="heartContainer"></div>
 
   <!-- Die sichtbare Content-Ebene -->
   <div class="scroll-wrapper">
+    
+    <!-- NEU: Das Bild ganz oben im eigenen Container -->
+    <div class="image-container">
+        <img src="urlaub.jpg" alt="Urlaub" class="responsive-img">
+    </div>
+
     <div class="wrapper">
       <h1 class="main-title">
           <span class="emoji">🥰😍🥳</span>WE Time<span class="emoji">🥳😍🥰</span>
@@ -314,25 +309,21 @@
     updateCountdown();
     const intervalId = setInterval(updateCountdown, 1000);
 
-    // KORRIGIERTE HERZEN LOGIK
+    // HERZEN LOGIK
     const heartContainer = document.getElementById('heartContainer');
 
     function createHeart() {
       const heart = document.createElement('div');
       heart.classList.add('heart-particle');
         
-      // Zufälliges Herz-Symbol wählen
       const heartTypes = ['❤️', '💖', '💝', '💕'];
       heart.innerText = heartTypes[Math.floor(Math.random() * heartTypes.length)];
       
-      // Zufällige Position am unteren Bildschirmrand (0% bis 100% Breite)
       heart.style.left = Math.random() * 100 + 'vw';
       
-      // Zufällige Größe (zwischen 12px und 28px)
       const size = Math.random() * 16 + 12;
       heart.style.fontSize = size + 'px';
       
-      // Zufällige Flugdauer (zwischen 4 und 8 Sekunden)
       const duration = Math.random() * 4 + 4;
       heart.style.animationDuration = duration + 's';
       
